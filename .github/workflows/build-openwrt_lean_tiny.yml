@@ -23,11 +23,11 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FEEDS_CONF: 'lean_x86_64_tiny/feeds.conf.default'
-  CONFIG_FILE: 'lean_x86_64_tiny/config'
-  DEFAULT_SETTING: 'lean_x86_64_tiny/default.settings'
-  DIY_P1_SH: 'lean_x86_64_tiny/diy1.sh'
-  DIY_P2_SH: 'lean_x86_64_tiny/diy2.sh'
+  FEEDS_CONF: 'lean_x86_64_tiny-feeds.conf.default'
+  CONFIG_FILE: 'lean_x86_64_tiny-config'
+  DEFAULT_SETTING: 'lean_x86_64_tiny-default.settings'
+  DIY_P1_SH: 'lean_x86_64_tiny-diy1.sh'
+  DIY_P2_SH: 'lean_x86_64_tiny-diy2.sh'
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
@@ -69,6 +69,9 @@ jobs:
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
         chmod +x $DIY_P1_SH
+        echo '==============================='
+        echo $DIY_P1_SH
+        echo '==============================='
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
         ./scripts/feeds update -a
