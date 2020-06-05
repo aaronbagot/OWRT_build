@@ -1,6 +1,7 @@
 #=================================================
 # https://github.com/aaronbagot/OWRT_build 
 # From P3TERX @ https://github.com/P3TERX/Actions-OpenWrt
+# removed clone depth to avoid version check errors
 #=================================================
 
 name: Build OpenWrt from Lean Codes
@@ -13,19 +14,20 @@ on:
     branches:
       - master
     paths:
-      - 'lean_X86_64_tiny.config'
-  schedule:
-    - cron: 0 8 * * 5
+      - 'lean_x86_64_tiny/config'
+  #schedule:
+  #  - cron: 0 8 * * 5
   watch:
     types: started
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FEEDS_CONF: 'lean_X86_64_tiny.feeds'
-  CONFIG_FILE: 'lean_X86_64_tiny.config'
-  DIY_P1_SH: diy-part1.sh
-  DIY_P2_SH: diy-part2.sh
+  FEEDS_CONF: 'lean_x86_64_tiny/feeds.conf.default'
+  CONFIG_FILE: 'lean_x86_64_tiny/config'
+  DEFAULT_SETTING: 'lean_x86_64_tiny/default.settings'
+  DIY_P1_SH: 'lean_x86_64_tiny/diy1.sh'
+  DIY_P2_SH: 'lean_x86_64_tiny/diy2.sh'
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
@@ -55,31 +57,32 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+        
     - name: Clone source code
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-    - name: Load custom feeds
+        
+    - name: Load custom feeds, run diy1.sh, update packages, and install packages
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
         chmod +x $DIY_P1_SH
         cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
         ./scripts/feeds update -a
         ./scripts/feeds install -a
-        $GITHUB_WORKSPACE/$DIY_P1_SH
 
-    - name: update and Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
-
-    - name: Load custom configuration
+    - name: Load extra files, .config, and default settings; and run diy2.sh
       run: |
         [ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        [ -e $DEFAULT_SETTING ] && mv $DEFAULT_SETTING openwrt/package/lean/default-settings/files/zzz-default-settings
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
+        make defconfig
         
     - name: SSH connection to Actions
       uses: P3TERX/debugger-action@master
@@ -89,7 +92,7 @@ jobs:
       id: package
       run: |
         cd openwrt
-        make defconfig
+        make prereq
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
@@ -103,6 +106,7 @@ jobs:
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "::set-env name=DEVICE_NAME::_$(cat DEVICE_NAME)"
         echo "::set-env name=FILE_DATE::_$(date +"%Y%m%d%H%M")"
+        
     - name: Check space usage
       if: (!cancelled())
       run: df -hT
@@ -114,7 +118,7 @@ jobs:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
-    - name: Organize files
+    - name: Organize files and rm -rf packages
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
@@ -122,6 +126,7 @@ jobs:
         rm -rf packages
         echo "::set-env name=FIRMWARE::$PWD"
         echo "::set-output name=status::success"
+        
     - name: Upload firmware directory
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
