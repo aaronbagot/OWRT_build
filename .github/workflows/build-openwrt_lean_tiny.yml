@@ -14,7 +14,7 @@ on:
     branches:
       - master
     paths:
-      - 'lean_x86_64_tiny/config'
+      - 'lean_x86_64_tiny-config'
   #schedule:
   #  - cron: 0 8 * * 5
   watch:
