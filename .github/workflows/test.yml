@@ -36,15 +36,11 @@ jobs:
       run: |
         mkdir -p openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-        
-    - name: SSH connection to Actions
-      uses: aaronbagot/OWRT_build_ssh@master
-      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
       run: |
         [ -e $PROJECT_FOLDER/default.settings ] && mv $PROJECT_FOLDER/default.settings openwrt/default.settings
-        chmod +x $$PROJECT_FOLDER/test.sh
+        chmod +x $PROJECT_FOLDER/test.sh
         echo '==============================='
         echo $$PROJECT_FOLDER/test.sh
         echo '==============================='
@@ -53,5 +49,7 @@ jobs:
         echo '==============================='
         echo script ended!
         echo '==============================='
-
-
+            
+    - name: SSH connection to Actions
+      uses: aaronbagot/OWRT_build_ssh@master
+      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
