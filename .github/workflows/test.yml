@@ -13,10 +13,6 @@ on:
 
 env:
   PROJECT_FOLDER: lean_x86_64_mini
-  FEEDS_CONF: $PROJECT_FOLDER/default.settings
-  CONFIG_FILE: $PROJECT_FOLDER/config
-  DEFAULT_SETTING: $PROJECT_FOLDER/default.settings
-  DIY_P1_SH: $PROJECT_FOLDER/test.sh
   SSH_ACTIONS: true
 
 jobs:
@@ -47,21 +43,15 @@ jobs:
 
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
       run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-        chmod +x $DIY_P1_SH
+        [ -e $PROJECT_FOLDER/default.settings ] && mv $PROJECT_FOLDER/default.settings openwrt/default.settings
+        chmod +x $$PROJECT_FOLDER/test.sh
         echo '==============================='
-        echo $DIY_P1_SH
+        echo $$PROJECT_FOLDER/test.sh
         echo '==============================='
         cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P1_SH
+        $GITHUB_WORKSPACE/$PROJECT_FOLDER/test.sh
         echo '==============================='
         echo script ended!
         echo '==============================='
 
-    - name: Upload bin directory
-      uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-      with:
-        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: openwrt/bin
 
