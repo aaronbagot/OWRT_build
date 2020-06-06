@@ -2,14 +2,11 @@ name: TEST
 
 on:
   repository_dispatch:
-  release:
-    types: published
   push:
     branches:
       - master
     paths:
       - '.github/workflows/test.yml'
-
 
 env:
   FOLDER: lean_x86_64_mini
