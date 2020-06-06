@@ -12,8 +12,20 @@ on:
 
 
 env:
-  PROJECT_FOLDER: lean_x86_64_mini
-  SSH_ACTIONS: true
+  FOLDER: lean_x86_64_mini
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
+  FEEDS: feeds.conf.default
+  CONFIG: menuconfig
+  SETTINGS: default.settings
+  DIYSH1: diy1.sh
+  DIYSH2: diy2.sh  
+  SSH_ACTIONS: false
+  UPLOAD_BIN_DIR: false
+  UPLOAD_FIRMWARE: true
+  UPLOAD_COWTRANSFER: false
+  UPLOAD_WETRANSFER: false
+  TZ: Asia/Shanghai
 
 jobs:
   build:
@@ -39,13 +51,13 @@ jobs:
 
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
       run: |
-        [ -e $PROJECT_FOLDER/default.settings ] && mv $PROJECT_FOLDER/default.settings openwrt/default.settings
-        chmod +x $PROJECT_FOLDER/test.sh
+        [ -e $FOLDER/$CONFIG ] && mv $FOLDER/$CONFIG openwrt/.config && ls -al openwrt/.config
+        chmod +x $FOLDER/$DIYSH2
         echo '==============================='
-        echo $$PROJECT_FOLDER/test.sh
+        echo $FOLDER/$DIYSH2
         echo '==============================='
         cd openwrt
-        $GITHUB_WORKSPACE/$PROJECT_FOLDER/test.sh
+        $GITHUB_WORKSPACE/$FOLDER/$DIYSH2
         echo '==============================='
         echo script ended!
         echo '==============================='
