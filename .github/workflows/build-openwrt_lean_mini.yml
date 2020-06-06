@@ -1,33 +1,34 @@
 #=================================================
 # https://github.com/aaronbagot/OWRT_build 
-# From P3TERX @ https://github.com/P3TERX/Actions-OpenWrt
+# Inspired by P3TERX @ https://github.com/P3TERX/Actions-OpenWrt
 # removed clone depth to avoid version check errors
 #=================================================
 
-name: Build OpenWrt from Lean Codes
+name: Build MiniOpenWrtX86 from Lean Codes
 
 on:
   repository_dispatch:
   release:
     types: published
-  #push:
-  #  branches:
-  #    - master
-  #  paths:
-  #    - 'lean_x86_64_tiny/config'
+  push:
+    branches:
+      - master
+    paths:
+      - 'lean_x86_64_mini/menuconfig'
   #schedule:
   #  - cron: 0 8 * * 5
   #watch:
   #  types: started
 
 env:
+  FOLDER: lean_x86_64_mini
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FEEDS_CONF: 'lean_x86_64_tiny-feeds.conf.default'
-  CONFIG_FILE: 'lean_x86_64_tiny-config'
-  DEFAULT_SETTING: 'lean_x86_64_tiny-default.settings'
-  DIY_P1_SH: 'lean_x86_64_tiny-diy1.sh'
-  DIY_P2_SH: 'lean_x86_64_tiny-diy2.sh'
+  FEEDS: feeds.conf.default
+  CONFIG: menuconfig
+  SETTINGS: default.settings
+  DIYSH1: diy1.sh
+  DIYSH2: diy2.sh  
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
@@ -67,28 +68,25 @@ jobs:
         
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
       run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-        chmod +x $DIY_P1_SH
-        echo '==============================='
-        echo $DIY_P1_SH
-        echo '==============================='
+        [ -e $FOLDER/$FEEDS ] && mv $FOLDER/$FEEDS openwrt/feeds.conf.default
+        chmod +x $FOLDER/$DIYSH1
         cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P1_SH
+        $GITHUB_WORKSPACE/$FOLDER/$DIYSH1
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
     - name: Load extra files, .config, and default settings; and run diy2.sh
       run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        [ -e $DEFAULT_SETTING ] && mv $DEFAULT_SETTING openwrt/package/lean/default-settings/files/zzz-default-settings
-        chmod +x $DIY_P2_SH
+        [ -e $FOLDER/files ] && mv $FOLDER/files openwrt/files
+        [ -e $FOLDER/$CONFIG ] && mv $FOLDER/$CONFIG openwrt/.config
+        [ -e $FOLDER/$SETTINGS ] && mv $FOLDER/$SETTINGS openwrt/package/lean/default-settings/files/zzz-default-settings
+        chmod +x $FOLDER/$DIYSH2
         cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P2_SH
+        $GITHUB_WORKSPACE/$FOLDER/$DIYSH2
         make defconfig
         
     - name: SSH connection to Actions
-      uses: P3TERX/debugger-action@master
+      uses: aaronbagot/OWRT_build_ssh@master
       if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Download package
