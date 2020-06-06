@@ -1,0 +1,67 @@
+name: TEST
+
+on:
+  repository_dispatch:
+  release:
+    types: published
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/test.yml'
+
+
+env:
+  PROJECT_FOLDER: lean_x86_64_mini
+  FEEDS_CONF: $PROJECT_FOLDER/default.settings
+  CONFIG_FILE: $PROJECT_FOLDER/config
+  DEFAULT_SETTING: $PROJECT_FOLDER/default.settings
+  DIY_P1_SH: $PROJECT_FOLDER/test.sh
+  SSH_ACTIONS: true
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        
+    - name: Clone source code
+      working-directory: /workdir
+      run: |
+        mkdir -p openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        
+    - name: SSH connection to Actions
+      uses: aaronbagot/OWRT_build_ssh@master
+      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+
+    - name: Load custom feeds, run diy1.sh, update packages, and install packages
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        echo '==============================='
+        echo $DIY_P1_SH
+        echo '==============================='
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
+        echo '==============================='
+        echo script ended!
+        echo '==============================='
+
+    - name: Upload bin directory
+      uses: actions/upload-artifact@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      with:
+        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: openwrt/bin
+
