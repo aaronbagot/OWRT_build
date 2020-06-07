@@ -11,10 +11,10 @@ on:
   release:
     types: published
   push:
-    branches:
-      - master
-    paths:
-      - 'Offical19.07/menuconfig'
+  #  branches:
+  #    - master
+  #  paths:
+  #    - 'Offical19.07/menuconfig'
   #schedule:
   #  - cron: 0 8 * * 5
   #watch:
