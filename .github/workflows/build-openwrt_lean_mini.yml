@@ -49,10 +49,11 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+        echo '====================Initialization environment===================='
         sudo swapoff /swapfile
         sudo rm -rf /swapfile /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf
+        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf >> /dev/null 
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -62,21 +63,25 @@ jobs:
     - name: Clone source code
       working-directory: /workdir
       run: |
+        echo '====================    Clone source code    ===================='
         df -hT $PWD
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        git clone --depth 1 -b $REPO_BRANCH $REPO_URL  openwrt
+        echo 'MyVersion' > openwrt/version
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
       run: |
+        echo '====================    Load custom feeds    ===================='
         [ -e $FOLDER/$FEEDS ] && mv $FOLDER/$FEEDS openwrt/feeds.conf.default
         chmod +x $FOLDER/$DIYSH1
         cd openwrt
         $GITHUB_WORKSPACE/$FOLDER/$DIYSH1
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
+        ./scripts/feeds update -a  >> /dev/null 
+        ./scripts/feeds install -a   >> /dev/null 
 
     - name: Load extra files, .config, and default settings; and run diy2.sh
       run: |
+        echo '====================    Load extra settings    ===================='
         [ -e $FOLDER/files ] && mv $FOLDER/files openwrt/files
         [ -e $FOLDER/$CONFIG ] && mv $FOLDER/$CONFIG openwrt/.config
         [ -e $FOLDER/$SETTINGS ] && mv $FOLDER/$SETTINGS openwrt/package/lean/default-settings/files/zzz-default-settings
@@ -89,9 +94,10 @@ jobs:
       uses: aaronbagot/OWRT_build_ssh@master
       if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
-    - name: Download package
+    - name: Download all sources
       id: package
       run: |
+        echo '====================    Download all sources    ===================='
         cd openwrt
         make prereq
         make download -j8
@@ -100,9 +106,10 @@ jobs:
     - name: Compile the firmware
       id: compile
       run: |
+        echo '====================    Compile the firmware    ===================='
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 V=s
+        make -j$(nproc) V=sc
         echo "::set-output name=status::success"
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "::set-env name=DEVICE_NAME::_$(cat DEVICE_NAME)"
