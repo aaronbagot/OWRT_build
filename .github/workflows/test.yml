@@ -9,14 +9,14 @@ on:
       - '.github/workflows/test.yml'
 
 env:
-  FOLDER: lean_x86_64_mini
+  FOLDER: test
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS: feeds.conf.default
   CONFIG: menuconfig
   SETTINGS: default.settings
   DIYSH1: diy1.sh
-  DIYSH2: test.sh  
+  DIYSH2: testscript.sh  
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
