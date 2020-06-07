@@ -76,8 +76,8 @@ jobs:
         chmod +x $FOLDER/$DIYSH1
         cd openwrt
         $GITHUB_WORKSPACE/$FOLDER/$DIYSH1
-        ./scripts/feeds update -a  >> /dev/null 
-        ./scripts/feeds install -a   >> /dev/null 
+        ./scripts/feeds update -a >> /dev/null 
+        ./scripts/feeds install -a >> /dev/null 
 
     - name: Load extra files, .config, and default settings; and run diy2.sh
       run: |
@@ -109,7 +109,7 @@ jobs:
         echo '====================    Compile the firmware    ===================='
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) V=sc
+        make -j$(nproc) || make -j1 V=sc
         echo "::set-output name=status::success"
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "::set-env name=DEVICE_NAME::_$(cat DEVICE_NAME)"
