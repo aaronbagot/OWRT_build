@@ -17,7 +17,7 @@ env:
   SETTINGS: default.settings
   DIYSH1: diy1.sh
   DIYSH2: testscript.sh  
-  SSH_ACTIONS: false
+  SSH_ACTIONS: true
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
