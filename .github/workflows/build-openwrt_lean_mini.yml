@@ -108,7 +108,7 @@ jobs:
       run: |
         echo '====================    Compile the firmware    ===================='
         cd openwrt
-        echo -e "$(nproc) thread compile"
+        echo -e "$(nproc) thread compile, if failed 1 thread"
         make -j$(nproc) || make -j1 V=sc
         echo "::set-output name=status::success"
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
