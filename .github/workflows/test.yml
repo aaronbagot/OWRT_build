@@ -60,7 +60,7 @@ jobs:
         echo script ended!
         echo '==============================='
         cp $GITHUB_WORKSPACE/Official19.07/files/toolsmore.tar.gz .
-        gzip -dk toolsmore.tar.gz
+        tar -xzvf toolsmore.tar.gz
         cd tools
         gzip -d *.gz
         echo '================ok================
