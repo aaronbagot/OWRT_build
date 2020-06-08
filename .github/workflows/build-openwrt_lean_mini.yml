@@ -29,7 +29,7 @@ env:
   MYSETTINGS: default.settings
   DIYSH1: diy1.sh
   DIYSH2: diy2.sh  
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
