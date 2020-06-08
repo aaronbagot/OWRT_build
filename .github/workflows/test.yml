@@ -64,8 +64,9 @@ jobs:
         cd tools
         shopt -s nullglob
         for a in *.gz ; do gzip -d "$a" ; done
-        echo '================ok================'
+        echo '================ok1================'
         for a in *.gz ; do gzip -d "$a" ; done
+        echo '==============ok  2================'
         
         
         
