@@ -65,8 +65,7 @@ jobs:
       run: |
         echo '====================    Clone source code    ===================='
         df -hT $PWD
-        git clone --depth 1 -b $REPO_BRANCH $REPO_URL  openwrt
-        echo 'MyVersion' > openwrt/version
+        git clone -b $REPO_BRANCH $REPO_URL  openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
