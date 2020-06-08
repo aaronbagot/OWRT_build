@@ -62,7 +62,7 @@ jobs:
         cp $GITHUB_WORKSPACE/Official19.07/files/toolsmore.tar.gz .
         tar -xzvf toolsmore.tar.gz
         cd tools
-        gzip -d *.gz
+        gzip -d *.gz || true
         echo '================ok================
         
             
