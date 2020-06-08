@@ -117,7 +117,7 @@ jobs:
         FM_SUBTARGET=$(grep "^CONFIG_TARGET_SUBTARGET=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
         FM_PLATFORM=$(grep "^CONFIG_TARGET_ARCH_PACKAGES=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
         FM_PROFILE=$(grep "^CONFIG_TARGET_PROFILE=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
-        FM_DIR=$GITHUB_WORKSPACE/openwrt/bin/targets/$TARGET/$SUBTARGET
+        FM_DIR=$GITHUB_WORKSPACE/openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         echo $FM_TARGET $FM_SUBTARGET $FM_PLATFORM $FM_PROFILE $FM_DIR
         echo "::set-env name=FM_TARGET::$FM_TARGET"
         echo "::set-env name=FM_SUBTARGET::$FM_SUBTARGET"
