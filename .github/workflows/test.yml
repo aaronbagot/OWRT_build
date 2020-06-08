@@ -59,11 +59,12 @@ jobs:
         echo '==============================='
         echo script ended!
         echo '==============================='
-        # 在 Debian 中安装 qemu-utils
-        #sudo apt install qemu-utils
-        # 转换 img 为 vhdx, 其中 subformat 可为 "dynamic" 或 "fixed"
-        #qemu-img convert -f raw -O vhdx -o subformat=dynamic input.img output.vhdx
-        # curl -fsSL https://raw.githubusercontent.com/P3TERX/dotfiles/master/.bashrc >> ~/.bashrc
+        cp $GITHUB_WORKSPACE/Official19.07/files/toolsmore.tar.gz .
+        gzip -dk toolsmore.tar.gz
+        cd tools
+        gzip -d *.gz
+        echo '================ok================
+        
             
     - name: SSH connection to Actions
       uses: aaronbagot/OWRT_build_ssh@master
