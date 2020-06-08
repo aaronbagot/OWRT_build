@@ -62,11 +62,8 @@ jobs:
         cp $GITHUB_WORKSPACE/Official19.07/files/toolsmore.tar.gz .
         tar -xzvf toolsmore.tar.gz
         cd tools
-        for a in *.gz; 
-        do 
-          [ -e "$a"] || continue
-          gzip -d "$a"
-        done
+        shopt -s nullglob
+        for a in *.gz; do gzip -d "$a"; done
         echo '================ok================
         
             
