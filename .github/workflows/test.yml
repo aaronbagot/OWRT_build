@@ -63,7 +63,7 @@ jobs:
         tar -xzvf toolsmore.tar.gz
         cd tools
         shopt -s nullglob
-        for a in *.gz; do gzip -d "$a"; done
+        for a in *.gz ; do gzip -d "$a" ; done
         echo '================ok================
         
             
