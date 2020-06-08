@@ -59,6 +59,7 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+        source .bashrc
         
     - name: Clone source code
       working-directory: /workdir
@@ -107,8 +108,22 @@ jobs:
         echo -e "$(nproc) thread compile, if failed 1 thread"
         make -j$(nproc) || make -j1 V=sc
         echo "::set-output name=status::success"
-        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-        [ -s DEVICE_NAME ] && echo "::set-env name=DEVICE_NAME::_$(cat DEVICE_NAME)"
+
+    - name: Set Environment Variable
+      if: steps.compile.outputs.status == 'success' && !cancelled()
+      run: |
+        cd openwrt
+        FM_TARGET=$(grep "^CONFIG_TARGET_BOARD=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
+        FM_SUBTARGET=$(grep "^CONFIG_TARGET_SUBTARGET=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
+        FM_PLATFORM=$(grep "^CONFIG_TARGET_ARCH_PACKAGES=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
+        FM_PROFILE=$(grep "^CONFIG_TARGET_PROFILE=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
+        FM_DIR=$GITHUB_WORKSPACE/openwrt/bin/targets/$TARGET/$SUBTARGET
+        echo $FM_TARGET $FM_SUBTARGET $FM_PLATFORM $FM_PROFILE $FM_DIR
+        echo "::set-env name=FM_TARGET::$FM_TARGET"
+        echo "::set-env name=FM_SUBTARGET::$FM_SUBTARGET"
+        echo "::set-env name=FM_PLATFORM::$FM_PLATFORM"
+        echo "::set-env name=FM_PROFILE::$FM_PROFILE"
+        echo "::set-env name=FM_DIR::$FM_DIR"
         echo "::set-env name=FILE_DATE::_$(date +"%Y%m%d%H%M")"
         
     - name: Check space usage
@@ -123,34 +138,28 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        name: OpenWrt_bin$_{{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
-    - name: Organize files and rm -rf packages
+    - name: Convert img, keep img and vhdx and remove others
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
-        cd openwrt/bin/targets/*/*
-        rm -rf packages
-        echo "::set-env name=FIRMWARE::$PWD"
+        cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
+        rm -rf !(*.img*)
+        rm -rf *rootfs*
+        gzip -d *.gz
+        for a in $(ls *.img)
+        do
+          qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx
+        done
+        gzip -9r *
         echo "::set-output name=status::success"
         
     - name: Upload firmware directory
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: ${{ env.FIRMWARE }}
-
-    - name: Upload firmware to cowtransfer
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
-        echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
-    - name: Upload firmware to WeTransfer
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
-        echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+        name: OpenWrt_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
+        path: ${{ env.FM_DIR }}
+        

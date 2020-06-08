@@ -39,6 +39,7 @@ jobs:
       run: |
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+        source .bashrc
         
     - name: Clone source code
       working-directory: /workdir
