@@ -147,11 +147,11 @@ jobs:
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         rm -rf *rootfs*
-        shopt -s nullglob
-        for a in *.gz ; do gzip -d "$a" ; done
+        gzip -dr .
         rm -rf !(*.img)
+        shopt -s nullglob
         for a in *.img ; do qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx ; done
-        gzip -9r *
+        gzip -9r .
         echo "::set-output name=status::success"
         
     - name: Upload firmware directory

@@ -17,7 +17,7 @@ env:
   SETTINGS: default.settings
   DIYSH1: diy1.sh
   DIYSH2: testscript.sh  
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
@@ -62,14 +62,14 @@ jobs:
         cp $GITHUB_WORKSPACE/Official19.07/files/toolsmore.tar.gz .
         tar -xzvf toolsmore.tar.gz
         cd tools
+        gzip -dr .
+        echo '================ok1================'
         shopt -s nullglob
         for a in *.gz ; do gzip -d "$a" ; done
-        echo '================ok1================'
-        for a in *.gz ; do gzip -d "$a" ; done
         echo '==============ok  2================'
-        
-        
-        
+        rm -rf *
+        gzip -9r .
+        echo '==============ok  3================'
             
     - name: SSH connection to Actions
       uses: aaronbagot/OWRT_build_ssh@master
