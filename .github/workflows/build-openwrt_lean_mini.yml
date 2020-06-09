@@ -148,27 +148,25 @@ jobs:
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         echo 'before changes'
         ls -al
+        rm -rf !(*.img*)
+        echo 'after rm -rf !(*.img*)'
+        ls -al
         rm -rf *rootfs*
         echo 'after rm -rf *rootfs*'
         ls -al
         gzip -dr .
         echo 'after gzip -dr .'
         ls -al
-        rm -rf !(*.img)
-        echo 'after rm -rf !(*.img)'
-        ls -al
-        rm -rf packages || true
         shopt -s nullglob
         for a in *.img ; do qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx ; done
         echo 'before gzip -9r .'
         ls -al
         gzip -9r .
         echo "::set-output name=status::success"
-        # remove && steps.organize.outputs.status == 'success'
         
     - name: Upload firmware directory
       uses: actions/upload-artifact@master
-      if: (!cancelled())
+      if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: OpenWrt_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
