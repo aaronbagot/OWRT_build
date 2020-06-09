@@ -67,6 +67,8 @@ jobs:
         echo '====================    Clone source code    ===================='
         df -hT $PWD
         git clone -b $REPO_BRANCH $REPO_URL  openwrt
+        # to avoid version check errors (HEAD): (due to clone depth 1)
+        # echo 'Mini_openwrt_v20.x' > openwrt/version
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
@@ -146,27 +148,23 @@ jobs:
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
-        echo 'before changes'
-        ls -al
-        rm -rf !(*.img*)
-        echo 'after rm -rf !(*.img*)'
-        ls -al
-        rm -rf *rootfs*
-        echo 'after rm -rf *rootfs*'
-        ls -al
-        gzip -dr .
-        echo 'after gzip -dr .'
-        ls -al
+        shopt -s extglob
+        rm -rf !(*.img*) || true
+        rm -rf *rootfs*  || true
         shopt -s nullglob
-        for a in *.img ; do qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx ; done
-        echo 'before gzip -9r .'
-        ls -al
-        gzip -9r .
+        for a in *.img.gz ; do gzip -dkf "$a" ; done
+        for a in *.img
+        do
+          qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx || continue
+          gzip -9f "$a".vhdx || continue
+        done
+        rm -rf !(*.gz)
         echo "::set-output name=status::success"
+        # if: steps.organize.outputs.status == 'success' && !cancelled()
         
     - name: Upload firmware directory
       uses: actions/upload-artifact@master
-      if: steps.organize.outputs.status == 'success' && !cancelled()
+      if: !(cancelled())
       with:
         name: OpenWrt_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
