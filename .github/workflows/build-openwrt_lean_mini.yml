@@ -10,15 +10,15 @@ on:
   repository_dispatch:
   release:
     types: published
-  #push:
-  #  branches:
-  #    - master
-  #  paths:
-  #    - 'lean_x86_64_mini/build.config'
+  push:
+    branches:
+      - master
+    paths:
+      - 'lean_x86_64_mini/build.config'
   #schedule:
   #  - cron: 0 8 * * 5
-  watch:
-    types: started
+  #watch:
+  #  types: started
 
 env:
   FOLDER: lean_x86_64_mini
