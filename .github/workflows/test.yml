@@ -35,6 +35,8 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install qemu-utils
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
         source .bashrc
@@ -76,7 +78,7 @@ jobs:
         for a in *.img ; do gzip -9f "$a" ; done
         rm -rf !(*.gz)
         echo "::set-output name=status::success"
-        # if: steps.organize.outputs.status == 'success' && !cancelled()
+        ls -al
         
     - name: Upload firmware IMG
       uses: actions/upload-artifact@master
@@ -97,7 +99,9 @@ jobs:
           qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx || continue
           gzip -9f "$a".vhdx || continue
         done
+        shopt -s extglob
         rm -rf !(*.gz)
+        ls -al
         echo "::set-output name=status::success"
         
     - name: Upload firmware VHDX
