@@ -87,7 +87,7 @@ jobs:
 
     - name: Convert VHDX and keep only vhdx
       id: convertvhdx
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      if: ${{ always() }} && steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
       run: |
         cd openwrt/test/test_img
         shopt -s nullglob
