@@ -44,11 +44,18 @@ jobs:
       run: |
         mkdir -p openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+            
+    - name: SSH connection to Actions
+      uses: aaronbagot/OWRT_build_ssh@master
+      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
       id: compile
       run: |
         [ -e $FOLDER/$CONFIG ] && mv $FOLDER/$CONFIG openwrt/.config && ls -al openwrt/.config
+        pwd
+        echo "======files==========="
+        ls -al
         chmod +x $FOLDER/$DIYSH2
         cd openwrt
         $GITHUB_WORKSPACE/$FOLDER/$DIYSH2
@@ -104,7 +111,3 @@ jobs:
         name: OpenWrt_VHDX_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
         
-            
-    - name: SSH connection to Actions
-      uses: aaronbagot/OWRT_build_ssh@master
-      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
