@@ -9,7 +9,7 @@ on:
       - '.github/workflows/test.yml'
 
 env:
-  FOLDER: test
+  FOLDER: test_flow
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS: feeds.conf.default
