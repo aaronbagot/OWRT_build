@@ -31,9 +31,8 @@ env:
   DIYSH2: diy2.sh  
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: true
-  UPLOAD_COWTRANSFER: false
-  UPLOAD_WETRANSFER: false
+  UPLOAD_IMG: true
+  UPLOAD_VHDX: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -143,16 +142,34 @@ jobs:
         name: OpenWrt_bin$_{{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
-    - name: Convert img, keep img and vhdx and remove others
+    - name: Organize img and remove others others
       id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         shopt -s extglob
         rm -rf !(*.img*) || true
         rm -rf *rootfs*  || true
         shopt -s nullglob
-        for a in *.img.gz ; do gzip -dkf "$a" ; done
+        for a in *.img ; do gzip -9f "$a".gz ; done
+        rm -rf !(*.gz)
+        echo "::set-output name=status::success"
+        # if: steps.organize.outputs.status == 'success' && !cancelled()
+        
+    - name: Upload firmware IMG
+      uses: actions/upload-artifact@master
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_IMG == 'true'
+      with:
+        name: OpenWrt_IMG_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
+        path: ${{ env.FM_DIR }}
+
+    - name: Convert VHDX and keep only vhdx
+      id: convertvhdx
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      run: |
+        cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
+        shopt -s nullglob
+        for a in *.img.gz ; do gzip -df "$a" ; done
         for a in *.img
         do
           qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx || continue
@@ -160,12 +177,11 @@ jobs:
         done
         rm -rf !(*.gz)
         echo "::set-output name=status::success"
-        # if: steps.organize.outputs.status == 'success' && !cancelled()
         
-    - name: Upload firmware directory
+    - name: Upload firmware VHDX
       uses: actions/upload-artifact@master
-      if: (!cancelled())
+      if: steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
       with:
-        name: OpenWrt_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
+        name: OpenWrt_VHDX_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
         

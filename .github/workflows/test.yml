@@ -13,15 +13,14 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS: feeds.conf.default
-  CONFIG: menuconfig
-  SETTINGS: default.settings
+  MYCONFIG: build.config
+  MYSETTINGS: default.settings
   DIYSH1: diy1.sh
-  DIYSH2: testscript.sh  
+  DIYSH2: diy2.sh  
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: true
-  UPLOAD_COWTRANSFER: false
-  UPLOAD_WETRANSFER: false
+  UPLOAD_IMG: true
+  UPLOAD_VHDX: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -48,28 +47,64 @@ jobs:
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
+      id: compile
       run: |
         [ -e $FOLDER/$CONFIG ] && mv $FOLDER/$CONFIG openwrt/.config && ls -al openwrt/.config
         chmod +x $FOLDER/$DIYSH2
-        echo '==============================='
-        echo $FOLDER/$DIYSH2
-        echo '==============================='
         cd openwrt
         $GITHUB_WORKSPACE/$FOLDER/$DIYSH2
-        echo '==============================='
-        echo script ended!
-        echo '==============================='
-        cp $GITHUB_WORKSPACE/Official19.07/files/toolsmore.tar.gz .
-        tar -xzvf toolsmore.tar.gz
-        cd tools
-        gzip -dr .
-        echo '================ok1================'
-        shopt -s nullglob
-        for a in *.gz ; do gzip -d "$a" ; done
-        echo '==============ok  2================'
-        rm -rf *
-        gzip -9r .
         echo '==============ok  3================'
+        mkdir -p test
+        shopt -s nullglob
+        for a in $GITHUB_WORKSPACE/test/test_*.tar.gz
+        do 
+          tar -xzvf "$a" -C test/
+        done
+        echo "::set-output name=status::success"
+        
+    - name: Organize img and remove others others
+      id: organize
+      if: steps.compile.outputs.status == 'success' && !cancelled()
+      run: |
+        cd openwrt/test/test_img
+        shopt -s extglob
+        rm -rf !(*.img*) || true
+        rm -rf *rootfs*  || true
+        shopt -s nullglob
+        for a in *.img ; do gzip -9f "$a".gz ; done
+        rm -rf !(*.gz)
+        echo "::set-output name=status::success"
+        # if: steps.organize.outputs.status == 'success' && !cancelled()
+        
+    - name: Upload firmware IMG
+      uses: actions/upload-artifact@master
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_IMG == 'true'
+      with:
+        name: OpenWrt_IMG_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
+        path: ${{ env.FM_DIR }}
+
+    - name: Convert VHDX and keep only vhdx
+      id: convertvhdx
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      run: |
+        cd openwrt/test/test_img
+        shopt -s nullglob
+        for a in *.img.gz ; do gzip -df "$a" ; done
+        for a in *.img
+        do
+          qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx || continue
+          gzip -9f "$a".vhdx || continue
+        done
+        rm -rf !(*.gz)
+        echo "::set-output name=status::success"
+        
+    - name: Upload firmware VHDX
+      uses: actions/upload-artifact@master
+      if: steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      with:
+        name: OpenWrt_VHDX_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
+        path: ${{ env.FM_DIR }}
+        
             
     - name: SSH connection to Actions
       uses: aaronbagot/OWRT_build_ssh@master
