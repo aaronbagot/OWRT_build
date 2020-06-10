@@ -70,7 +70,7 @@ jobs:
       id: organize
       if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
-        cd openwrt/test/test_img
+        cd openwrt/test/test_gzipped
         shopt -s extglob
         rm -rf !(*.img*) || true
         rm -rf *rootfs*  || true
@@ -91,7 +91,7 @@ jobs:
       id: convertvhdx
       if: ${{ always() }} && steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
       run: |
-        cd openwrt/test/test_img
+        cd openwrt/test/test_gzipped
         shopt -s nullglob
         for a in *.img.gz ; do gzip -df "$a" ; done
         for a in *.img
@@ -106,7 +106,7 @@ jobs:
         
     - name: Upload firmware VHDX
       uses: actions/upload-artifact@master
-      if: steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      if: ${{ always() }} && steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
       with:
         name: OpenWrt_VHDX_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
