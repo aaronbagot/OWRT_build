@@ -15,8 +15,7 @@ env:
   FEEDS: feeds.conf.default
   MYCONFIG: build.config
   MYSETTINGS: default.settings
-  DIYSH1: diy1.sh
-  DIYSH2: diy2.sh  
+  DIYSH2: testscript.sh  
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_IMG: true
