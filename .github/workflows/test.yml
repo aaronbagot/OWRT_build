@@ -52,9 +52,6 @@ jobs:
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
       id: compile
       run: |
-        pwd
-        echo "======files==========="
-        ls -al
         chmod +x $FOLDER/$DIYSH2
         cd openwrt
         $GITHUB_WORKSPACE/$FOLDER/$DIYSH2
@@ -76,7 +73,7 @@ jobs:
         rm -rf !(*.img*) || true
         rm -rf *rootfs*  || true
         shopt -s nullglob
-        for a in *.img ; do gzip -9f "$a".gz ; done
+        for a in *.img ; do gzip -9f "$a" ; done
         rm -rf !(*.gz)
         echo "::set-output name=status::success"
         # if: steps.organize.outputs.status == 'success' && !cancelled()
