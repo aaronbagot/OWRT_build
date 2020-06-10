@@ -52,7 +52,6 @@ jobs:
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
       id: compile
       run: |
-        [ -e $FOLDER/$CONFIG ] && mv $FOLDER/$CONFIG openwrt/.config && ls -al openwrt/.config
         pwd
         echo "======files==========="
         ls -al
