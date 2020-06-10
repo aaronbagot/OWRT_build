@@ -18,7 +18,7 @@ env:
   DIYSH2: testscript.sh  
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
-  UPLOAD_IMG: true
+  UPLOAD_IMG: false
   UPLOAD_VHDX: true
   TZ: Asia/Shanghai
 
