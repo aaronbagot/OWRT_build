@@ -62,7 +62,7 @@ jobs:
         echo '==============ok  3================'
         mkdir -p test
         shopt -s nullglob
-        for a in $GITHUB_WORKSPACE/test/test_*.tar.gz
+        for a in $GITHUB_WORKSPACE/$FOLDER/test_*.tar.gz
         do 
           tar -xzvf "$a" -C test/
         done
