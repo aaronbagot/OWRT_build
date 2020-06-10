@@ -151,10 +151,10 @@ jobs:
         rm -rf !(*.img*) || true
         rm -rf *rootfs*  || true
         shopt -s nullglob
-        for a in *.img ; do gzip -9f "$a".gz ; done
+        for a in *.img ; do gzip -9f "$a" ; done
         rm -rf !(*.gz)
+        ls -al
         echo "::set-output name=status::success"
-        # if: steps.organize.outputs.status == 'success' && !cancelled()
         
     - name: Upload firmware IMG
       uses: actions/upload-artifact@master
@@ -165,7 +165,7 @@ jobs:
 
     - name: Convert VHDX and keep only vhdx
       id: convertvhdx
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      if: ${{ always() }} && steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         shopt -s nullglob
@@ -175,12 +175,13 @@ jobs:
           qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx || continue
           gzip -9f "$a".vhdx || continue
         done
+        shopt -s extglob
         rm -rf !(*.gz)
         echo "::set-output name=status::success"
         
     - name: Upload firmware VHDX
       uses: actions/upload-artifact@master
-      if: steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      if: ${{ always() }} && steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
       with:
         name: OpenWrt_VHDX_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
