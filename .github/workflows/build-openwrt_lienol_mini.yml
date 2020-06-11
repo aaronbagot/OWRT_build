@@ -10,11 +10,11 @@ on:
   repository_dispatch:
   release:
     types: published
-  #push:
-  #  branches:
-  #    - master
-  #  paths:
-  #    - 'lienol_1907_mini/build.config'
+  push:
+    branches:
+      - master
+    paths:
+      - 'lienol_1907_mini/build.config'
   #schedule:
   #  - cron: 0 8 * * 5
   #watch:
