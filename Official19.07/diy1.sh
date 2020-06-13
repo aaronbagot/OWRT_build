@@ -8,8 +8,9 @@
 
 mkdir -p package/custom
 cd package/custom
-git clone --depth 1 https://github.com/kenzok8/small passwallneeded && echo 'passwallneeded' > passwallneeded/version
-git clone --depth 1 https://github.com/kenzok8/openwrt-packages deletedpackage && echo 'deletedpackage' > deletedpackage/version
-git clone --depth 1 https://github.com/Lienol/openwrt-package lienolpackage && echo 'lienolpackage' > lienolpackage/version
 
+git clone https://github.com/kenzok8/small kenzok8small
+git clone https://github.com/kenzok8/openwrt-packages kenzok8
+git clone -b dev-19.07 https://github.com/Lienol/openwrt-packages lienolpackages
+git clone https://github.com/Lienol/openwrt-package lienolpackage
 
