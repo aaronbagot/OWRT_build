@@ -31,7 +31,7 @@ env:
   DIYSH2: diy2.sh  
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
-  UPLOAD_IMG: false
+  UPLOAD_IMG: true
   UPLOAD_VHDX: true
   TZ: Asia/Shanghai
 
