@@ -134,9 +134,9 @@ jobs:
     - name: Check space usage
       if: (!cancelled())
       run: |
-      df -hT
-      echo "-----------test env---------------"
-      echo ${{ env.FM_TARGET }} ${{ env.FM_SUBTARGET }} ${{ env.FM_PLATFORM }} ${{ env.FM_PROFILE }} ${{ env.FM_DIR }}  ${{ env.FILE_DATE }} 
+        df -hT
+        echo "=========test env========="
+        echo ${{ env.FM_TARGET }} ${{ env.FM_SUBTARGET }} ${{ env.FM_PLATFORM }} ${{ env.FM_PROFILE }} ${{ env.FM_DIR }}  ${{ env.FILE_DATE }} 
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
