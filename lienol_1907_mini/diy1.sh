@@ -7,7 +7,7 @@
 mkdir -p package/custom
 cd package/custom
 #git clone https://github.com/coolsnowwolf/packages leanpackage
-git clone https://github.com/kenzok8/small passwallneeded
+# git clone https://github.com/kenzok8/small passwallneeded
 git clone https://github.com/kenzok8/openwrt-packages deletedpackage
 #git clone https://github.com/Lienol/openwrt-package lienolpackage
 #git clone https://github.com/fw876/helloworld helloworld
