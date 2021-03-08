@@ -30,9 +30,9 @@ env:
   DIYSH1: diy1.sh
   DIYSH2: diy2.sh  
   SSH_ACTIONS: false
-  UPLOAD_BIN_DIR: true
+  UPLOAD_BIN_DIR: false
   UPLOAD_IMG: true
-  UPLOAD_VHDX: false
+  UPLOAD_VHDX: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -125,7 +125,7 @@ jobs:
         echo "FM_PLATFORM=$FM_PLATFORM" >> $GITHUB_ENV
         echo "FM_PROFILE=$FM_PROFILE" >> $GITHUB_ENV
         echo "FM_DIR=$FM_DIR" >> $GITHUB_ENV
-        echo "FILE_DATE=$FILE_DATE" >> $GITHUB_ENV
+        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
             
     - name: SSH connection to Actions
       uses: aaronbagot/OWRT_build_ssh@master
@@ -142,7 +142,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_bin$_{{ env.FM_PROFILE }}${{ env.FILE_DATE }}
+        name: OpenWrt_bin_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: Organize img and remove others others
