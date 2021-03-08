@@ -13,8 +13,8 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'lienol_1907_mini/build.config'
+  #  paths:
+  #    - 'lienol_1907_mini/build.config'
   #schedule:
   #  - cron: 0 8 * * 5
   watch:
@@ -30,9 +30,9 @@ env:
   DIYSH1: diy1.sh
   DIYSH2: diy2.sh  
   SSH_ACTIONS: false
-  UPLOAD_BIN_DIR: false
+  UPLOAD_BIN_DIR: true
   UPLOAD_IMG: true
-  UPLOAD_VHDX: true
+  UPLOAD_VHDX: false
   TZ: Asia/Shanghai
 
 jobs:
