@@ -120,16 +120,19 @@ jobs:
         FM_PROFILE=$(grep "^CONFIG_TARGET_PROFILE=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
         FM_DIR=$GITHUB_WORKSPACE/openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         echo $FM_TARGET $FM_SUBTARGET $FM_PLATFORM $FM_PROFILE $FM_DIR
-        echo "::set-env name=FM_TARGET::$FM_TARGET"
-        echo "::set-env name=FM_SUBTARGET::$FM_SUBTARGET"
-        echo "::set-env name=FM_PLATFORM::$FM_PLATFORM"
-        echo "::set-env name=FM_PROFILE::$FM_PROFILE"
-        echo "::set-env name=FM_DIR::$FM_DIR"
-        echo "::set-env name=FILE_DATE::_$(date +"%Y%m%d%H%M")"
+        echo "FM_TARGET=$FM_TARGET" >> $GITHUB_ENV
+        echo "FM_SUBTARGET=$FM_SUBTARGET" >> $GITHUB_ENV
+        echo "FM_PLATFORM=$FM_PLATFORM" >> $GITHUB_ENV
+        echo "FM_PROFILE=$FM_PROFILE" >> $GITHUB_ENV
+        echo "FM_DIR=$FM_DIR" >> $GITHUB_ENV
+        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
         
     - name: Check space usage
       if: (!cancelled())
-      run: df -hT
+      run: |
+        df -hT
+        echo "=========test env========="
+        echo ${{ env.FM_TARGET }} ${{ env.FM_SUBTARGET }} ${{ env.FM_PLATFORM }} ${{ env.FM_PROFILE }} ${{ env.FM_DIR }}  ${{ env.FILE_DATE }} 
             
     - name: SSH connection to Actions
       uses: aaronbagot/OWRT_build_ssh@master
@@ -139,7 +142,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_bin$_{{ env.FM_PROFILE }}${{ env.FILE_DATE }}
+        name: OpenWrt_bin_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: Organize img and remove others others

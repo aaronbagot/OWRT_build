@@ -13,8 +13,8 @@ on:
   push:
     branches:
       - master
-  #  paths:
-  #    - 'lienol_1907_mini/build.config'
+    paths:
+      - 'lienol_1907_mini/build.config'
   #schedule:
   #  - cron: 0 8 * * 5
   watch:
