@@ -77,6 +77,7 @@ jobs:
         chmod +x $FOLDER/$DIYSH1
         cd openwrt
         $GITHUB_WORKSPACE/$FOLDER/$DIYSH1
+        ./scripts/feeds clean >> /dev/null 
         ./scripts/feeds update -a >> /dev/null 
         ./scripts/feeds install -a >> /dev/null 
 
