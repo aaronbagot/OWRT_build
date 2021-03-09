@@ -111,6 +111,11 @@ jobs:
         make -j$(nproc) || make -j1 V=sc
         echo "::set-output name=status::success"
 
+    - name: SSH connection to Actions
+      uses: aaronbagot/OWRT_build_ssh@master
+      # if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+      if: steps.compile.outputs.status != 'success'
+
     - name: Set Environment Variable
       if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
@@ -135,10 +140,6 @@ jobs:
         echo "=========test env========="
         echo ${{ env.FM_TARGET }} ${{ env.FM_SUBTARGET }} ${{ env.FM_PLATFORM }} ${{ env.FM_PROFILE }} ${{ env.FM_DIR }}  ${{ env.FILE_DATE }} 
             
-    - name: SSH connection to Actions
-      uses: aaronbagot/OWRT_build_ssh@master
-      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
-
     - name: Upload bin directory
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
