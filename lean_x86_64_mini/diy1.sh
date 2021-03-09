@@ -2,7 +2,7 @@
 
 # 方案一：clone kenzok8，然后删掉其passwall, 加上新版的passwall
 # the following for lean's openwrt master only
-sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
+# sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
 
 cd package
 

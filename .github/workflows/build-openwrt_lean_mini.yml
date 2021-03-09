@@ -17,8 +17,8 @@ on:
       - 'lean_x86_64_mini/build.config'
   #schedule:
   #  - cron: 0 8 * * 5
-  #watch:
-  #  types: started
+  watch:
+    types: started
 
 env:
   FOLDER: lean_x86_64_mini
@@ -169,7 +169,8 @@ jobs:
 
     - name: Convert VHDX and keep only vhdx
       id: convertvhdx
-      if: ${{ always() }} && steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      # 如果 if: ${{ always() }} && steps.organize.outputs.status == 'success' 则不论后半什么结果，都是TRUE
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         shopt -s nullglob
@@ -185,7 +186,7 @@ jobs:
         
     - name: Upload firmware VHDX
       uses: actions/upload-artifact@master
-      if: ${{ always() }} && steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      if: steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
       with:
         name: OpenWrt_VHDX_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
