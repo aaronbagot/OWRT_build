@@ -156,7 +156,7 @@ jobs:
         shopt -s nullglob extglob
         rm -rf !(*.img*) || true
         rm -rf *rootfs*  || true
-        for a in *.img ; do gzip -9f "$a" ; done
+        for a in *.img ; do gzip -9qf "$a" ; done
         rm -rf !(*.gz)
         ls -al
         echo "::set-output name=status::success"
@@ -175,11 +175,11 @@ jobs:
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         shopt -s nullglob extglob
-        for a in *.img.gz ; do gzip -df "$a" ; done
+        for a in *.img.gz ; do gzip -dqf "$a" ; done
         for a in *.img
         do
           qemu-img convert -f raw -O vhdx -o subformat=dynamic "$a" "$a".vhdx || continue
-          gzip -9f "$a".vhdx || continue
+          gzip -9qf "$a".vhdx || continue
         done
         rm -rf !(*.gz)
         echo "::set-output name=status::success"
