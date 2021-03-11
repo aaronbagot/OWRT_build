@@ -152,12 +152,13 @@ jobs:
       if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
+        ls -al 
         shopt -s extglob
         rm -rf !(*.img*) || true
         rm -rf *rootfs*  || true
-         for a in *.img ; do gzip -9f "$a" ; done
-        rm -rf !(*.gz) || true
         shopt -s nullglob
+        for a in *.img ; do gzip -9f "$a" ; done
+        rm -rf !(*.gz)
         ls -al
         echo "::set-output name=status::success"
         
