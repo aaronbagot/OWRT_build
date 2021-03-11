@@ -3,8 +3,6 @@
 # Inspired by P3TERX @ https://github.com/P3TERX/Actions-OpenWrt
 # removed clone depth to avoid version check errors
 #=================================================
-# 按以下改
-# https://stackoverflow.com/questions/57850553/github-actions-check-steps-status
 
 name: Build MiniOpenWrtX86 from Lean Codes
 
@@ -40,7 +38,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-18.04
-    # 防止别人点star，加上这句后只有自己点的（或push）才触发
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
@@ -117,7 +114,7 @@ jobs:
     - name: SSH connection to Actions
       uses: aaronbagot/OWRT_build_ssh@master
       # if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
-      if: env.SSH_ACTIONS == 'true' && steps.compile.outputs.status != 'success'
+      if: steps.compile.outputs.status != 'success'
 
     - name: Set Environment Variable
       if: steps.compile.outputs.status == 'success' && !cancelled()
