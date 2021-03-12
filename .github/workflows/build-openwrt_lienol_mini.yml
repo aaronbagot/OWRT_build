@@ -37,6 +37,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-18.04
+    # 防止别人点star，加上这句后只有自己点的（或push）才触发
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
