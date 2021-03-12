@@ -2,9 +2,7 @@
 # https://github.com/aaronbagot/OWRT_build 
 # Inspired by P3TERX @ https://github.com/P3TERX/Actions-OpenWrt
 #=================================================
-
 name: Build MiniOpenWrtX86 from Lienol Codes
-
 on:
   repository_dispatch:
   release:
@@ -14,8 +12,6 @@ on:
       - master
     paths:
       - 'lienol_1907_mini/build.config'
-  #schedule:
-  #  - cron: 0 8 * * 5
   watch:
     types: started
 
