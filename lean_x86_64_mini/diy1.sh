@@ -4,17 +4,18 @@
 # sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
 
 cd package
-git clone https://github.com/kenzok8/openwrt-packages kenzok8
-cd kenzok8
-for f in gost luci-app-clash luci-app-dnsfilter luci-app-gost luci-app-openclash luci-app-passwall luci-app-smartdns luci-app-ssr-plus luci-app-vssr luci-theme-argon_new luci-theme-atmaterial luci-theme-edge luci-theme-opentomato luci-theme-opentomcat luci-theme-opentopd screenshot smartdns ; do rm -rf ${f} ; done
-cd ..
-git clone https://github.com/Lienol/openwrt-package lienolpkg
-cd lienolpkg
-shopt -s extglob
-rm -rf !(*control*)  || true
-shopt -s nullglob
-cd ..
 git clone https://github.com/xiaorouji/openwrt-passwall passwall 
+mkdir -p kenzok8
+cd kenzok8
+for f in AdGuardHome lua-maxminddb luci-app-adguardhome luci-app-advancedsetting luci-app-aliddns luci-app-eqos luci-app-jd-dailybonus luci-theme-ifit microsocks naiveproxy redsocks2 tcping
+	do 
+		svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/${f}
+done
 cd ..
-
-
+mkdir -p lienolpkg
+cd lienolpkg
+svn export --quiet https://github.com/Lienol/openwrt-package/trunk/luci-app-control-timewol
+svn export --quiet https://github.com/Lienol/openwrt-package/trunk/luci-app-control-webrestriction
+svn export --quiet https://github.com/Lienol/openwrt-package/trunk/luci-app-control-weburl
+svn export --quiet https://github.com/Lienol/openwrt-package/trunk/luci-app-timecontrol
+cd ../..
