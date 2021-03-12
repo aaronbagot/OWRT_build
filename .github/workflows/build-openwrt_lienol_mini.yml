@@ -1,7 +1,6 @@
 #=================================================
 # https://github.com/aaronbagot/OWRT_build 
 # Inspired by P3TERX @ https://github.com/P3TERX/Actions-OpenWrt
-# removed clone depth to avoid version check errors
 #=================================================
 
 name: Build MiniOpenWrtX86 from Lienol Codes
