@@ -19,8 +19,8 @@ on:
       - 'lean_x86_64_mini/build.config'
   #schedule:
   #  - cron: 0 8 * * 5
-  watch:
-    types: started
+  #watch:
+  #  types: started
 
 env:
   FOLDER: lean_x86_64_mini
