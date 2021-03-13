@@ -18,8 +18,8 @@ on:
       - 'lienol_1907_mini/build.config'
   #schedule:
   #  - cron: 0 8 * * 5
-  watch:
-    types: started
+  #watch:
+  #  types: started
 
 env:
   FOLDER: lienol_1907_mini
@@ -164,7 +164,7 @@ jobs:
         for a in *.img ; do gzip -9qf "$a" ; done
         rm -rf !(*.gz)
         ls -al
-        echo "::set-output name=status::success"
+        #echo "::set-output name=status::success"
       continue-on-error: true
         
     - name: Upload firmware IMG

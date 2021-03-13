@@ -1,10 +1,7 @@
 #=================================================
 # https://github.com/aaronbagot/OWRT_build 
 # Inspired by P3TERX @ https://github.com/P3TERX/Actions-OpenWrt
-# removed clone depth to avoid version check errors
 #=================================================
-# 按以下改
-# https://stackoverflow.com/questions/57850553/github-actions-check-steps-status
 
 name: Build MiniOpenWrtX86 from Lean Codes
 
@@ -19,8 +16,8 @@ on:
       - 'lean_x86_64_mini/build.config'
   #schedule:
   #  - cron: 0 8 * * 5
-  #watch:
-  #  types: started
+  watch:
+    types: started
 
 env:
   FOLDER: lean_x86_64_mini
@@ -62,6 +59,7 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
         source .bashrc
+      continue-on-error: true
 
     - name: Clone source code
       working-directory: /workdir
@@ -112,7 +110,8 @@ jobs:
         cd openwrt
         echo -e "$(nproc) thread compile, if failed 1 thread"
         make -j$(nproc) || make -j1 V=sc
-        echo "::set-output name=status::success"
+        #echo "::set-output name=status::success"
+      continue-on-error: true
 
     - name: SSH connection to Actions
       uses: aaronbagot/OWRT_build_ssh@master
@@ -120,7 +119,7 @@ jobs:
       if: env.SSH_ACTIONS == 'true' && steps.compile.outputs.status != 'success'
 
     - name: Set Environment Variable
-      if: steps.compile.outputs.status == 'success' && !cancelled()
+      if: steps.compile.conclusion == 'success' && !cancelled()
       run: |
         cd openwrt
         FM_TARGET=$(grep "^CONFIG_TARGET_BOARD=" .config | cut -d"=" -f2 | sed -e 's/^"//' -e 's/"$//')
@@ -135,6 +134,7 @@ jobs:
         echo "FM_PROFILE=$FM_PROFILE" >> $GITHUB_ENV
         echo "FM_DIR=$FM_DIR" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+      continue-on-error: true
         
     - name: Check space usage
       if: (!cancelled())
@@ -145,14 +145,14 @@ jobs:
             
     - name: Upload bin directory
       uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      if: steps.compile.conclusion == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
     - name: Organize img and remove others others
       id: organize
-      if: steps.compile.outputs.status == 'success' && !cancelled()
+      if: steps.compile.outcome == 'success' && !cancelled()
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         ls -al 
@@ -162,11 +162,12 @@ jobs:
         for a in *.img ; do gzip -9qf "$a" ; done
         rm -rf !(*.gz)
         ls -al
-        echo "::set-output name=status::success"
+        #echo "::set-output name=status::success"
+      continue-on-error: true
         
     - name: Upload firmware IMG
       uses: actions/upload-artifact@master
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_IMG == 'true'
+      if: steps.organize.conclusion == 'success' && env.UPLOAD_IMG == 'true'
       with:
         name: OpenWrt_IMG_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
@@ -174,7 +175,7 @@ jobs:
     - name: Convert VHDX and keep only vhdx
       id: convertvhdx
       # 如果 if: ${{ always() }} && steps.organize.outputs.status == 'success' 则不论后半什么结果，都是TRUE
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      if: steps.organize.outcome == 'success' && env.UPLOAD_VHDX == 'true'
       run: |
         cd openwrt/bin/targets/$FM_TARGET/$FM_SUBTARGET
         shopt -s nullglob extglob
@@ -185,11 +186,12 @@ jobs:
           gzip -9qf "$a".vhdx || continue
         done
         rm -rf !(*.gz)
-        echo "::set-output name=status::success"
+        #echo "::set-output name=status::success"
+      continue-on-error: true
         
     - name: Upload firmware VHDX
       uses: actions/upload-artifact@master
-      if: steps.convertvhdx.outputs.status == 'success' && env.UPLOAD_VHDX == 'true'
+      if: steps.convertvhdx.conclusion == 'success' && env.UPLOAD_VHDX == 'true'
       with:
         name: OpenWrt_VHDX_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
