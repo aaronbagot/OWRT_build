@@ -188,11 +188,10 @@ jobs:
         rm -rf !(*.gz)
         #echo "::set-output name=status::success"
       continue-on-error: true
-        
+
     - name: Upload firmware VHDX
       uses: actions/upload-artifact@master
       if: steps.convertvhdx.conclusion == 'success' && env.UPLOAD_VHDX == 'true'
       with:
         name: OpenWrt_VHDX_${{ env.FM_PLATFORM }}_${{ env.FM_PROFILE }}${{ env.FILE_DATE }}
         path: ${{ env.FM_DIR }}
-        
