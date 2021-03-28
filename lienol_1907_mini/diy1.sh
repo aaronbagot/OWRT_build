@@ -9,8 +9,8 @@
 
 mkdir -p package/custom
 cd  package/custom
-git clone https://github.com/xiaorouji/openwrt-passwall passwall
-git clone https://github.com/jerrykuku/luci-app-jd-dailybonus luci-app-jd-dailybonus
+git clone https://github.com/xiaorouji/openwrt-passwall passwall --depth 1
+git clone https://github.com/jerrykuku/luci-app-jd-dailybonus luci-app-jd-dailybonus --depth 1	
 ## add 2 lines
 #git clone https://github.com/jerrykuku/lua-maxminddb.git
 #git clone https://github.com/jerrykuku/luci-app-vssr.git

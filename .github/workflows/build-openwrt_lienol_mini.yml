@@ -68,9 +68,9 @@ jobs:
       run: |
         echo '====================    Clone source code    ===================='
         df -hT $PWD
-        git clone -b $REPO_BRANCH $REPO_URL  openwrt
-        # echo "to avoid version check errors (HEAD): (due to clone depth 1)"
-        # echo 'Mini_openwrt_v20.x' > openwrt/version
+        git clone -b $REPO_BRANCH $REPO_URL  openwrt --depth 1
+        echo "to avoid version check errors (HEAD): (due to clone depth 1)"
+        echo 'OpenWRT_1907_lienol' > openwrt/version
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
