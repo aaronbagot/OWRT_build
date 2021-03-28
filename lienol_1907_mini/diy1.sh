@@ -21,7 +21,7 @@ svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-app-al
 svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-app-eqos
 svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-theme-ifit
 # add 1 line
-svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-theme-argon_new
+# svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-theme-argon_new
 cd ..
 mkdir -p leanpkg
 cd leanpkg
