@@ -12,21 +12,21 @@ cd  package/custom
 git clone https://github.com/xiaorouji/openwrt-passwall passwall
 git clone https://github.com/jerrykuku/luci-app-jd-dailybonus luci-app-jd-dailybonus
 ## add 2 lines
-git clone https://github.com/jerrykuku/lua-maxminddb.git
-git clone https://github.com/jerrykuku/luci-app-vssr.git
+#git clone https://github.com/jerrykuku/lua-maxminddb.git
+#git clone https://github.com/jerrykuku/luci-app-vssr.git
 mkdir -p kenzok8
 cd kenzok8
 svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-app-advancedsetting
 svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-app-aliddns
 svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-app-eqos
-svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-theme-ifit
+#svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-theme-ifit
 # add 1 line
 # svn export --quiet https://github.com/kenzok8/openwrt-packages/trunk/luci-theme-argon_new
 cd ..
 mkdir -p leanpkg
 cd leanpkg
 svn export --quiet https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-rclone
-svn export --quiet https://github.com/coolsnowwolf/lede/trunk/package/lean/rclone-ng
+#svn export --quiet https://github.com/coolsnowwolf/lede/trunk/package/lean/rclone-ng
 svn export --quiet https://github.com/coolsnowwolf/lede/trunk/package/lean/rclone-webui-react
 svn export --quiet https://github.com/coolsnowwolf/lede/trunk/package/lean/rclone
 svn export --quiet https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-ttyd
