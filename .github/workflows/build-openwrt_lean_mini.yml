@@ -31,7 +31,7 @@ env:
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_IMG: true
-  UPLOAD_VHDX: true
+  UPLOAD_VHDX: false
   TZ: Asia/Shanghai
 
 jobs:
@@ -68,7 +68,7 @@ jobs:
         df -hT $PWD
         git clone -b $REPO_BRANCH $REPO_URL  openwrt
         # to avoid version check errors (HEAD): (due to clone depth 1)
-        # echo 'Mini_openwrt_v20.x' > openwrt/version
+        echo 'Lean_openwrt_R20.x' > openwrt/version
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
     - name: Load custom feeds, run diy1.sh, update packages, and install packages
@@ -99,7 +99,7 @@ jobs:
         echo '====================    Download all sources    ===================='
         cd openwrt
         make prereq
-        make download -j8
+        make download -j8 || make download -j1
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
